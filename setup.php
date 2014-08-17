@@ -1,6 +1,6 @@
 <?php /* HELPDESK $Id: setup.php,v 1.47 2005/10/07 16:09:10 pedroix Exp $ */
 if (!defined('W2P_BASE_DIR')) {
-	die('You should not access this file directly');
+    die('You should not access this file directly');
 }
 
 /* Help Desk module definitions */
@@ -24,9 +24,10 @@ if (@$a == 'setup') {
 print w2PshowModuleConfig( $config );
 }
 
-class CSetupHelpDesk {
-
-    public function install() {
+class CSetupHelpDesk extends w2p_System_Setup
+{
+    public function install()
+    {
         $success = true;
         $bulk_sql[] = "
             CREATE TABLE helpdesk_items (
@@ -91,39 +92,108 @@ class CSetupHelpDesk {
             }
         }
 
-        $sk = new CSysKey( 'HelpDeskList', 'Enter values for list', '0', "\n", '|' );
-        $sk->store();
+        $q = $this->_getQuery();
+        $i = 0;
+        $priorities = array('Not Specified', 'Low', 'Normal', 'High');
+        foreach ($priorities as $priority) {
+            $q->clear();
+            $q->addTable('sysvals');
+            $q->addInsert('sysval_key_id', 1);
+            $q->addInsert('sysval_title', 'HelpDeskPriority');
+            $q->addInsert('sysval_value', $priority);
+            $q->addInsert('sysval_value_id', $i);
+            $q->exec();
+            $i++;
+        }
 
-        $sv = new CSysVal( $sk->syskey_id, 'HelpDeskPriority', "0|Not Specified\n1|Low\n2|Medium\n3|High" );
-        $sv->store();
+        $i = 0;
+        $severities = array('Not Specified', 'No Impact', 'Low', 'Medium', 'High', 'Critical');
+        foreach ($severities as $severity) {
+            $q->clear();
+            $q->addTable('sysvals');
+            $q->addInsert('sysval_key_id', 1);
+            $q->addInsert('sysval_title', 'HelpDeskSeverity');
+            $q->addInsert('sysval_value', $severity);
+            $q->addInsert('sysval_value_id', $i);
+            $q->exec();
+            $i++;
+        }
 
-        $sv = new CSysVal( $sk->syskey_id, 'HelpDeskSeverity', "0|Not Specified\n1|No Impact\n2|Low\n3|Medium\n4|High\n5|Critical" );
-        $sv->store();
+        $i = 0;
+        $types = array('Not Specified', 'Incident', 'Feature Request', 'Account Request', 'Complaint', 'Bug', 'User Support');
+        foreach ($types as $type) {
+            $q->clear();
+            $q->addTable('sysvals');
+            $q->addInsert('sysval_key_id', 1);
+            $q->addInsert('sysval_title', 'HelpDeskCallType');
+            $q->addInsert('sysval_value', $type);
+            $q->addInsert('sysval_value_id', $i);
+            $q->exec();
+            $i++;
+        }
 
-        $sv = new CSysVal( $sk->syskey_id, 'HelpDeskCallType', "0|Not Specified\n1|Incident\n2|Feature Request\n3|Account Request\n4|Complaint\n5|Bug\n6|User Support" );
-        $sv->store();
+        $i = 0;
+        $sources = array('Not Specified', 'E-Mail', 'Phone', 'Fax', 'In Person', 'E-Lodged', 'WWW');
+        foreach ($sources as $source) {
+            $q->clear();
+            $q->addTable('sysvals');
+            $q->addInsert('sysval_key_id', 1);
+            $q->addInsert('sysval_title', 'HelpDeskSource');
+            $q->addInsert('sysval_value', $source);
+            $q->addInsert('sysval_value_id', $i);
+            $q->exec();
+            $i++;
+        }
 
-        $sv = new CSysVal( $sk->syskey_id, 'HelpDeskSource', "0|Not Specified\n1|E-Mail\n2|Phone\n3|Fax\n4|In Person\n5|E-Lodged\n6|WWW" );
-        $sv->store();
+        $i = 0;
+        $services = array('Not Specified', 'Linux', 'Unix', 'Solaris', 'Windows 2000', 'Windows XP', 'Other');
+        foreach ($services as $service) {
+            $q->clear();
+            $q->addTable('sysvals');
+            $q->addInsert('sysval_key_id', 1);
+            $q->addInsert('sysval_title', 'HelpDeskService');
+            $q->addInsert('sysval_value', $service);
+            $q->addInsert('sysval_value_id', $i);
+            $q->exec();
+            $i++;
+        }
 
-        $sv = new CSysVal( $sk->syskey_id, 'HelpDeskService', "0|Not Applicable\n1|Linux\n2|Unix\n3|Solaris\n4|Windows 2000\n5|Windows XP\n999|Other" );
-        $sv->store();
+        $i = 0;
+        $statuses = array('Unassigned', 'Open', 'Closed', 'On Hold', 'Testing');
+        foreach ($statuses as $status) {
+            $q->clear();
+            $q->addTable('sysvals');
+            $q->addInsert('sysval_key_id', 1);
+            $q->addInsert('sysval_title', 'HelpDeskStatus');
+            $q->addInsert('sysval_value', $status);
+            $q->addInsert('sysval_value_id', $i);
+            $q->exec();
+            $i++;
+        }
 
-        $sv = new CSysVal( $sk->syskey_id, 'HelpDeskApplic', "0|Not Applicable" );
-        $sv->store();
-
-        $sv = new CSysVal( $sk->syskey_id, 'HelpDeskStatus', "0|Unassigned\n1|Open\n2|Closed\n3|On Hold\n4|Testing" );
-        $sv->store();
-
-        $sv = new CSysVal( $sk->syskey_id, 'HelpDeskAuditTrail', "0|Created\n1|Title\n2|Requestor Name\n3|Requestor E-mail\n4|Requestor Phone\n5|Assigned To\n6|Notify by e-mail\n7|Company\n8|Project\n9|Call Type\n10|Call Source\n11|Status\n12|Priority\n13|Severity\n14|Service\n15|Application\n16|Summary\n17|Deadline\n18|Deleted" );
-        $sv->store();
+        $i = 0;
+        $audittrails = array('Created', 'Title', 'Requestor Name', 'Requestor E-mail', 'Requestor Phone', 'Assigned To',
+                            'Notify by e-mail', 'Company', 'Project', 'Call Type', 'Call Source', 'Status', 'Priority',
+                            'Severity', 'Service', 'Application', 'Summary', 'Deadline', 'Deleted');
+        foreach ($audittrails as $audittrail) {
+            $q->clear();
+            $q->addTable('sysvals');
+            $q->addInsert('sysval_key_id', 1);
+            $q->addInsert('sysval_title', 'HelpDeskAuditTrail');
+            $q->addInsert('sysval_value', $audittrail);
+            $q->addInsert('sysval_value_id', $i);
+            $q->exec();
+            $i++;
+        }
 
         global $AppUI;
         $perms = $AppUI->acl();
+
         return $perms->registerModule('Help Desk', 'helpdesk');
     }
 
-    public function remove() {
+    public function remove()
+    {
         $success = true;
 
         $bulk_sql[] = "DROP TABLE helpdesk_items";
@@ -144,7 +214,7 @@ class CSetupHelpDesk {
         $q->addQuery('syskey_id');
         $q->addTable('syskeys');
         $q->addWhere('syskey_name = \'HelpDeskList\'');
-        $id = $q->loadResult();
+        $id = (int) $q->loadResult();
 
         unset($bulk_sql);
 
@@ -167,7 +237,8 @@ class CSetupHelpDesk {
         return $success;
     }
 
-    public function upgrade($old_version) {
+    public function upgrade($old_version)
+    {
         $success = true;
 
         switch ($old_version) {
@@ -248,10 +319,12 @@ class CSetupHelpDesk {
 
         global $AppUI;
         $perms = $AppUI->acl();
+
         return $perms->registerModule('Help Desk', 'helpdesk');
     }
 
-    public function configure() {
+    public function configure()
+    {
         global $AppUI;
 
         $AppUI->redirect("m=helpdesk&a=configure");

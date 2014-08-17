@@ -2,20 +2,18 @@
 if (!defined('W2P_BASE_DIR')) {
 	die('You should not access this file directly');
 }
-
+include_once("helpdesk.functions.php");
 /* This file will write a php config file to be included during execution of
  * all helpdesk files which require the configuration options. */
 
 // Deny all but system admins
 if (!canView('system')) {
-	$AppUI->redirect( "m=public&a=access_denied" );
+	$AppUI->redirect(ACCESS_DENIED);
 }
 
 @include_once( "./functions/admin_func.php" );
 
 $CONFIG_FILE = "./modules/helpdesk/config.php";
-
-$AppUI->savePlace();
 
 // get a list of permitted companies
 $company = new CCompany();
@@ -104,10 +102,6 @@ $config_options = array(
 		"value" => '',
     'type' => 'select',
     'list' => $assignUsers       
-    //"value" => 1,
-		//'type' => 'radio',
-    //'buttons' => array (1 => $AppUI->_('Yes'),
-     //                  0 => $AppUI->_('No'))
 	),
 	"default_company_current_company" => array(	 
 		"description" => $AppUI->_('Default Company'),
