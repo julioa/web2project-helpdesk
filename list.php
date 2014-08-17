@@ -3,6 +3,9 @@ if (!defined('W2P_BASE_DIR')) {
   die('You should not access this file directly');
 }
 include_once 'helpdesk.functions.php';
+include_once './modules/helpdesk/config.php';
+global $HELPDESK_CONFIG;
+
 $allowedCompanies = getAllowedCompanies();
 $allowedProjects = getAllowedProjects();
 $ipr = w2PgetSysVal( 'HelpDeskPriority' );
